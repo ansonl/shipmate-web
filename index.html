@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>SHIPMATE</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/style.css">
+	<script src="js/jquery-2.2.0.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="https://maps.googleapis.com/maps/api/js?libraries=geometry,places,drawing&ext=.js"></script>
+	<script src="js/geolocation-marker.js"></script>
+	<script src="js/objects.js"></script>
+	<script src="js/script.js"></script>
+</head>
+<body>
+	<div class="container-fluid" id="godViewContainer">
+		<div class="col-md-12" id="godViewColumn">
+			<div id="mapCanvas"></div>
+			<div class="alert alert-danger alert-dismissible" id="messageContainer" role="alert">
+			  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+			  <span id="messageTitle">Javascript Required!</span> <span id="messageBody">Please enable Javascript to use this page.</span>
+			</div>
+		</div>
+	</div>
+	<div class="container-fluid" id="detailViewContainer">
+		<div class="row">
+			<div class="col-md-12" id="detailViewColumn"></div>
+		</div>
+		<div class="row">
+			<div class="col-md-12" id="actionViewColumn">
+				<!--<p class="actionColumnTitle">Actions</p>-->
+				<div id="actionDynamic"></div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
