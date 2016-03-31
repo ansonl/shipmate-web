@@ -37,14 +37,20 @@ var Pickup = {
            this.phoneAndTimeHolder = $('<span></span>');
         }
 
+        var formattedPhoneNumber = updatedDict['phoneNumber'].slice(0,3)+"-"+updatedDict['phoneNumber'].slice(3,6)+"-"+updatedDict['phoneNumber'].slice(6);
         //update phone number p element
         if (this.phoneNumberTitle == null) {
+            var phoneNumberLink = $('<a></a>');
+            phoneNumberLink.attr('href', 'tel:'+formattedPhoneNumber);
+
             var phoneNumberTitle = $('<p></p>');
             phoneNumberTitle.addClass('phoneNumberTitle');
-            this.phoneAndTimeHolder.append(phoneNumberTitle);
+
+            phoneNumberLink.append(phoneNumberTitle);
+
+            this.phoneAndTimeHolder.append(phoneNumberLink);
             this.phoneNumberTitle = phoneNumberTitle;
         }
-        var formattedPhoneNumber = updatedDict['phoneNumber'].slice(0,3)+"-"+updatedDict['phoneNumber'].slice(3,6)+"-"+updatedDict['phoneNumber'].slice(6);
         this.phoneNumberTitle.text(formattedPhoneNumber);
         
         //update time p element
