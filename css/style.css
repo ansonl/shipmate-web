@@ -23,7 +23,7 @@ a {
 	padding: 0px;
 }
 
-#messageContainer {
+.messageContainer {
 	position: absolute;
 	width: 100%;
 	left: 0px;
@@ -33,7 +33,7 @@ a {
 	text-align: center;
 }
 
-#messageTitle {
+.messageTitle {
 	font-weight: bold;
 }
 
@@ -124,7 +124,11 @@ a {
 	text-align: center;
 }
 
-/* Hide Google logo due to lack of space */
+#mapActionsColumn {
+	padding-top: 15px;
+}
+
+/* Hide Google logo due to lack of space if desired. (Against Terms of Use)*/
 /* http://stackoverflow.com/questions/12499886/how-to-hide-or-disable-the-google-logo-footer-copyright-on-google-maps-javascr */
 /*a[href^="http://maps.google.com/maps"]{display:none !important}*/
 /*a[href^="https://maps.google.com/maps"]{display:none !important}*/

@@ -18,9 +18,13 @@
 	<div class="container-fluid" id="godViewContainer">
 		<div class="col-md-12" id="godViewColumn">
 			<div id="mapCanvas"></div>
-			<div class="alert alert-danger alert-dismissible" id="messageContainer" role="alert">
-			  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-			  <span id="messageTitle">Javascript Required!</span> <span id="messageBody">Please enable Javascript to use this page.</span>
+			<div class="alert alert-danger alert-dismissible messageContainer" id="driverAlertMessageContainer" role="alert">
+			  <a class="close" onclick="$('#driverAlertMessageContainer').hide()"><span aria-hidden="true">&times;</span></a>  
+			  <span class="messageTitle">Javascript Required!</span> <span class="messageBody">Please enable Javascript to use this page.</span>
+			</div>
+			<div class="alert alert-info alert-dismissible messageContainer" id="listAllNumbersContainer" role="alert">
+			  <a class="close" onclick="$('#listAllNumbersContainer').hide()"><span aria-hidden="true">&times;</span></a>  
+			  <span class="messageTitle"></span> <span class="messageBody"></span>
 			</div>
 		</div>
 	</div>
@@ -32,6 +36,13 @@
 			<div class="col-md-12" id="actionViewColumn">
 				<!--<p class="actionColumnTitle">Actions</p>-->
 				<div id="actionDynamic"></div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12" id="mapActionsColumn">
+				<button type="button" class="btn btn-primary" id="mapCenterBtn"><span class="glyphicon glyphicon-screenshot" aria-hidden="true"></span> Recenter Map</button>
+				<button type="button" class="btn btn-default" id="refreshPickupsBtn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Refresh Pickups</button>
+				<button type="button" class="btn btn-info" id="listAllPickupsBtn"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> Pickup List</button>
 			</div>
 		</div>
 	</div>

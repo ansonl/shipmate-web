@@ -18,7 +18,7 @@ var phrase;
 
 $(document).ready(function () {
     setupMapCanvas($('#mapCanvas'));
-    $('#messageContainer').hide();
+    $('.messageContainer').hide();
 
     phrase = window.prompt('Please enter a phrase','');
     while (phrase == null || phrase.length == 0) {
@@ -33,7 +33,7 @@ $(document).ready(function () {
         var watchId = navigator.geolocation.watchPosition(locationUpdate, locationError, {enableHighAccuracy: true,timeout: Infinity,maximumAge: 0});
     } else {
         //alert("Geolocation is not supported by this browser. \nPeople will not be able to see the van location. :(");
-        showMessage('Location Unavailable!', 'We can\'t get your device\'s location, people won\'t be able to see the van\'s location.');  
+        showDriverAlertMessage('Location Unavailable!', 'We can\'t get your device\'s location, people won\'t be able to see the van\'s location.');  
     }
 
     //try to get wakelock on screen when it is finally supported
@@ -41,15 +41,34 @@ $(document).ready(function () {
         console.log('Navigator.requestWakeLock() not supported...yet. ')
     }
 
-    updateAllPickups();
-    updateVanLocation();
+    //start repeat calls of pickup and van location update funtions
+    loopFunctionWithTimeout(updateAllPickups, 3000);
+    loopFunctionWithTimeout(updateVanLocation, 10000);
+
+    //setup Map center button click handler
+    $('#mapCenterBtn').click(function(){setMapBounds()});
+
+    //setup refresh pickups button click handler
+    $('#refreshPickupsBtn').click(function(){updateAllPickups()});
+
+    //setup list all pickups button click handler
+    $('#listAllPickupsBtn').click(function(){showAllPickupsMessage()});
 });
 
+function loopFunctionWithTimeout(someFunction, timeout) {
+    someFunction();
+    window.setTimeout(function() {loopFunctionWithTimeout(someFunction, timeout)},timeout);
+}
+
 function updateVanLocation() {
+    
+    //return if no location
     if (!currentLocation) {
-        window.setTimeout(updateVanLocation,1000);
+        console.log("no current location for updateVanLocation");
+       //window.setTimeout(updateVanLocation,1000);
         return;
     }
+    
 
     $.ajax({
         type:"POST",
@@ -67,10 +86,8 @@ function updateVanLocation() {
         },
         error: function(data, textStatus) {
             console.log(data, textStatus);
-            showMessage('Connection Down!', 'Seems like you have no internet right now.<br/>Device provided error:<br/>' + textStatus + '<br/>We\'ll keep retrying.');  
         }
     });
-    window.setTimeout(updateVanLocation,10000);
 }
 
 function updateAllPickups() {
@@ -87,10 +104,10 @@ function updateAllPickups() {
         },
         error: function(data, textStatus) {
             console.log(data, textStatus);
+            showDriverAlertMessage('Connection Down!', 'Device has no internet. We\'ll keep retrying.');  
+
         }
     });
-
-    window.setTimeout(updateAllPickups,10000);
 }
 
 function setupMapCanvas(targetMapDiv) {
@@ -143,6 +160,8 @@ function setupMapCanvas(targetMapDiv) {
 
 function setMapBounds() {
     
+    console.log("setting map bounds");
+
     //default to usna coordinates
     var minLat = 38.9844;
     var minLng = -76.4889;
@@ -230,14 +249,18 @@ function updatePickupMarkers(data, textStatus) {
 
     //Only consider setting Map Bounds if the pickup objects keys have changed
     var newPhoneNumbers = Object.keys(pickupObjects);
-    if (newPhoneNumbers.length == pickupObjects.length) {
+
+    if (newPhoneNumbers.length == oldPhoneNumbers.length) {
         var update = false;
-        for (var i = 0, l=newPhoneNumbers.length; i < l; i++)
-            if (!(pickupObjects[i] instanceof oldPhoneNumbers))
+        for (var i = 0, l=newPhoneNumbers.length; i < l; i++) {
+            if (oldPhoneNumbers.indexOf(newPhoneNumbers[i]) == -1)
                 update = true;
-        if (update)
+        }
+        if (update) {
             setMapBounds();
+        }
     } else if (newPhoneNumbers.length > 0) { //if old/new array length delta, only set bounds if there are any pickups
+        console.log('test');
         setMapBounds();
     }
     
@@ -263,9 +286,9 @@ function locationUpdate(position) {
     //set global currentLocation object to the new LatLng object
     currentLocation = newLocation;
 
-    console.log(Object.keys(pickupObjects))
-
+    //DISABLED based on feedback from drivers 02APR16 (Dan Iskandar at ArmyNavyStarMeet16), they wanted it to stop moving the map around all the time
     //center on currect location if no pickups
+    /*
     if (Object.keys(pickupObjects).length == 0 && centerOnLocationUpdate == true) {
         //mapReference.setCenter(currentLocation)
         console.log("location update, no pickups, center on geomarker");
@@ -274,14 +297,21 @@ function locationUpdate(position) {
     } else {
         setMapBounds();
     }
+    */
+    //instead, just center on location for first location update ever
+    if (centerOnLocationUpdate == true) {
+        map.fitBounds(GeoMarker.getBounds());
+        centerOnLocationUpdate = false;
+    }
 
-    //update current position marker
+
+    //update current position marker if using google maps market object
     //currentPositionMarker.setPosition(currentLocation);
 }
 
 function locationError(error) {
     console.log('Failed to get location.\n' + error.message);
-    showMessage('Location Unavailable!', 'Device provided error:<br/>' + error.message);  
+    showDriverAlertMessage('Location Unavailable!', 'Device provided error:<br/>' + error.message);  
     
 }
 
@@ -307,8 +337,21 @@ function presentedStatusForNumber(statusNumber) {
     return statusText;
 }
 
-function showMessage(title, body) {
-    $('#messageTitle').html(title);
-    $('#messageBody').html(body);
-    $('#messageContainer').fadeIn('fast').delay(10000).fadeOut('fast');;
+function showDriverAlertMessage(title, body) {
+    $('#driverAlertMessageContainer .messageTitle').html(title);
+    $('#driverAlertMessageContainer .messageBody').html(body);
+    $('#driverAlertMessageContainer').fadeIn('fast').delay(10000).fadeOut('fast');
+}
+
+function showAllPickupsMessage() {
+    var messageSpan = $('<span></span>');
+    var keyArray = Object.keys(pickupObjects);
+    for (var i = 0; i < keyArray.length; i++) {
+        listItem = $('<p></p>');
+        listItem.text(keyArray[i] + ' - ' + presentedStatusForNumber(pickupObjects[keyArray[i]].latestDict.status));
+        messageSpan.append(listItem);
+    }
+    $('#listAllNumbersContainer .messageTitle').text('All Recent Pickups');
+    $('#listAllNumbersContainer .messageBody').empty().append(messageSpan);
+    $('#listAllNumbersContainer').fadeIn('fast');
 }
