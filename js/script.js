@@ -13,6 +13,7 @@ var centerOnLocationUpdate = true;
 
 //geolocation-marker library object reference
 var GeoMarker;
+var audioElement;
 
 var phrase;
 
@@ -53,6 +54,10 @@ $(document).ready(function () {
 
     //setup list all pickups button click handler
     $('#listAllPickupsBtn').click(function(){showAllPickupsMessage()});
+
+    //load audio
+    audioElement = document.createElement('audio');
+    audioElement.setAttribute('src', 'assets/kizilsungur__sweetalertsound5.wav');
 });
 
 function loopFunctionWithTimeout(someFunction, timeout) {
@@ -253,14 +258,18 @@ function updatePickupMarkers(data, textStatus) {
     if (newPhoneNumbers.length == oldPhoneNumbers.length) {
         var update = false;
         for (var i = 0, l=newPhoneNumbers.length; i < l; i++) {
-            if (oldPhoneNumbers.indexOf(newPhoneNumbers[i]) == -1)
+            if (oldPhoneNumbers.indexOf(newPhoneNumbers[i]) == -1) {
                 update = true;
+                audioElement.play();
+            }   
         }
         if (update) {
             setMapBounds();
         }
+    } else if (newPhoneNumbers.length > oldPhoneNumbers.length) { //more pickups, at least one should be new
+        audioElement.play();
+        setMapBounds();
     } else if (newPhoneNumbers.length > 0) { //if old/new array length delta, only set bounds if there are any pickups
-        console.log('test');
         setMapBounds();
     }
     
