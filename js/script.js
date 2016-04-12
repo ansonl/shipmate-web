@@ -21,12 +21,12 @@ $(document).ready(function () {
     setupMapCanvas($('#mapCanvas'));
     $('.messageContainer').hide();
 
-    phrase = window.prompt('Please enter a phrase','');
+    phrase = window.prompt('Please enter a phrase (case-sensitive)','');
     while (phrase == null || phrase.length == 0) {
         var noPhraseConfirm = confirm('Continue without a phrase?');
         if (noPhraseConfirm == true)
             break;
-        phrase = window.prompt('Please enter a phrase','');
+        phrase = window.prompt('Please enter a phrase (case-sensitive)','');
     }
 
     if (navigator.geolocation) {
@@ -105,7 +105,10 @@ function updateAllPickups() {
             phrase: phrase,
         },
         success: function(data, textStatus) {
-            updatePickupMarkers(data, textStatus);
+            if (data.hasOwnProperty('status') && data['status'] != 0)
+                showDriverAlertMessage('Phrase Incorrect!', 'We can\'t get a list of pickups because the server is rejecting the phrase.\nPlease reload the page and enter the correct phrase.');
+            else
+                updatePickupMarkers(data, textStatus);
         },
         error: function(data, textStatus) {
             console.log(data, textStatus);
@@ -349,7 +352,8 @@ function presentedStatusForNumber(statusNumber) {
 function showDriverAlertMessage(title, body) {
     $('#driverAlertMessageContainer .messageTitle').html(title);
     $('#driverAlertMessageContainer .messageBody').html(body);
-    $('#driverAlertMessageContainer').fadeIn('fast').delay(10000).fadeOut('fast');
+    $('#driverAlertMessageContainer').fadeIn('fast');
+    //$('#driverAlertMessageContainer').fadeIn('fast').delay(10000).fadeOut('fast');
 }
 
 function showAllPickupsMessage() {
